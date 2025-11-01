@@ -1,4 +1,3 @@
-// src/App.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import {
@@ -46,8 +45,9 @@ import cert2 from "./assets/Cybersecurity.jpg";
 import cert3 from "./assets/EnglishIT.jpg";
 import cert4 from "./assets/CyberThreat.jpg";
 import cert5 from "./assets/Dataanalytics.jpg";
-import resume from "./assets/Sigua_Resume-1.jpg"
 import resumepdf from "./assets/Sigua_Resume.pdf";
+import myPhoto from "./assets/1X1.jpg";
+
 /* ===== Data ===== */
 const TESTIMONIALS = [
   { quote: "A fast learner with strong ownership.", name: "Lance Pogi", role: "Team Lead" },
@@ -79,8 +79,7 @@ const SKILL_ICONS = [
   { label: "GitHub", Icon: SiGithubLogo },
 ];
 
-/* ===== Certificates (click to view in modal) =====
-   Put your cert images in /public/assets/certificates/ or adjust paths. */
+/* ===== Certificates (click to view in modal) ===== */
 const CERTIFICATES = [
   {
     title: "CCNAv7: Introduction to Networks",
@@ -100,7 +99,7 @@ const CERTIFICATES = [
     year: `October 22, 2024`,
     image: cert3,
   },
-    {
+  {
     title: "Cyber Threat Management",
     issuer: "Cisco Networking Academy Program",
     year: `October 25, 2024`,
@@ -125,10 +124,13 @@ export default function Portfolio() {
   const [showTop, setShowTop] = useState(false);
 
   /* New: active certificate for the modal */
-  const [activeCert, setActiveCert] = useState(null); // {title, issuer, year, image} | null
+  const [activeCert, setActiveCert] = useState(null);
+
+  /* NEW: contact form submit state for Formspree */
+  const [submitStatus, setSubmitStatus] = useState("idle");
+  const [submitMsg, setSubmitMsg] = useState("");
 
   useEffect(() => {
-    // Dark-only theme
     document.documentElement.setAttribute("data-bs-theme", "dark");
   }, []);
 
@@ -140,20 +142,48 @@ export default function Portfolio() {
 
   const year = useMemo(() => new Date().getFullYear(), []);
 
-  const handleContactSubmit = (e) => {
+  /* UPDATED: send to Formspree instead of mailto */
+  const handleContactSubmit = async (e) => {
     e.preventDefault();
+    setSubmitStatus("loading");
+    setSubmitMsg("");
+
     const form = e.currentTarget;
-    const name = form.name.value.trim();
-    const email = form.email.value.trim();
-    const message = form.message.value.trim();
-    if (!name || !email || !message) return;
-    const subject = encodeURIComponent("OJT Applicant Portfolio Inquiry");
-    const body = encodeURIComponent(`Hi, I'm ${name}.
+    const data = {
+      name: form.name.value.trim(),
+      email: form.email.value.trim(),
+      message: form.message.value.trim(),
+    };
 
-${message}
+    if (!data.name || !data.email || !data.message) {
+      setSubmitStatus("error");
+      setSubmitMsg("Please complete all fields.");
+      return;
+    }
 
-You can reach me at ${email}.`);
-    window.location.href = `mailto:patricksigua007@gmail.com?subject=${subject}&body=${body}`;
+    try {
+      const res = await fetch("https://formspree.io/f/mwpwwzzv", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (res.ok) {
+        setSubmitStatus("success");
+        setSubmitMsg("Thanks! Your message has been sent.");
+        form.reset();
+      } else {
+        const err = await res.json().catch(() => ({}));
+        setSubmitStatus("error");
+        setSubmitMsg(
+          err?.errors?.[0]?.message ||
+            "Sorry, something went wrong while sending. Please try again."
+        );
+      }
+    } catch {
+      setSubmitStatus("error");
+      setSubmitMsg("Network error. Please check your connection and try again.");
+    }
   };
 
   /* Build slides: 6 logos per slide on desktop */
@@ -182,7 +212,7 @@ You can reach me at ${email}.`);
         </svg>
       </div>
 
-      {/* ===== Styles (sticky glass nav + mobile/tablet sizing + brand logo + tech carousel) ===== */}
+      {/* ===== Styles (includes .avatar) ===== */}
       <style>{`
         /* Theme */
         [data-bs-theme='dark']{
@@ -192,14 +222,13 @@ You can reach me at ${email}.`);
           --border:rgba(255,255,255,.14);
         }
 
-        /* --- Base type scale (Desktop >= 992px) --- */
         :root{
           --fs-title: 3.0rem;
           --fs-h2: 2.0rem;
           --fs-body: 1rem;
           --fs-lead: 1.125rem;
           --space-section: 3.5rem;
-          --hero-min: 660px;
+          --hero-min: 560px;
           --radius-card: 20px;
         }
 
@@ -210,13 +239,11 @@ You can reach me at ${email}.`);
           text-rendering: optimizeLegibility;
         }
 
-        /* Containers */
         .container-narrow{ width:min(100%,1120px); margin:0 auto; padding:0 1rem; }
         .muted{ color:var(--muted); }
         .layer-1{ position:relative; z-index:5; }
         .break{ overflow-wrap:anywhere; word-break:break-word; }
 
-        /* Ambient */
         .unreal-layers{ position:fixed; inset:0; pointer-events:none; z-index:0; max-width:100vw; overflow:hidden; }
         .unreal-layers > *{ max-width:100vw; overflow:hidden; }
         .stars{ position:absolute; inset:-10%; opacity:.2;
@@ -237,7 +264,6 @@ You can reach me at ${email}.`);
         @keyframes orbit2 { 50%{ transform: translate3d(-6vw,-3vh,0) scale(1.08);} }
         @keyframes orbit3 { 50%{ transform: translate3d(-4vw,6vh,0) scale(1.03);} }
 
-        /* ===== Sticky Glass Navbar (fixed) ===== */
         .center-nav{
           position: fixed;
           top: calc(env(safe-area-inset-top, 0px));
@@ -246,11 +272,10 @@ You can reach me at ${email}.`);
           display: flex; justify-content: center;
           padding: .5rem 0;
           pointer-events: none;
-          --nav-h: 72px; /* desktop nav height incl paddings */
+          --nav-h: 72px;
         }
         .nav-shell{ pointer-events: auto; }
 
-        /* ===== Glass style for nav ===== */
         .nav-shell{
           width:min(960px,92vw);
           border-radius:9999px;
@@ -295,7 +320,6 @@ You can reach me at ${email}.`);
         }
         .navbar-toggler{ padding:.6rem .8rem; border-width:1px; }
 
-        /* Brand logo sizing */
         .brand-logo{
           width: 28px; height: 28px; display:block; object-fit: contain;
           border-radius: 9999px;
@@ -307,14 +331,10 @@ You can reach me at ${email}.`);
           .brand-logo{ width: 24px; height: 24px; padding: 3px; }
         }
 
-        /* Spacer to avoid content hiding under fixed nav */
         .nav-spacer{ height: calc(var(--nav-h) + 12px); }
-
-        /* Sections */
         .hero{ padding:0; }
         .section{ padding: var(--space-section) 0; }
 
-        /* Hero */
         .hero-wrap{ position:relative; min-height: var(--hero-min); isolation:isolate; }
         .hero-bg{ position:absolute; inset:0; z-index:1; mask-image: radial-gradient(120% 120% at 50% 0%, black 55%, transparent 100%); }
         .hero-bg canvas{ display:block; width:100% !important; height:100% !important; max-width:100vw !important; }
@@ -323,7 +343,6 @@ You can reach me at ${email}.`);
           background: linear-gradient(to bottom, transparent, color-mix(in oklab, var(--bg-1) 92%, #000 8%));
         }
 
-        /* Type (no lighting) */
         .unreal-title{
           font-size: var(--fs-title);
           line-height:1.08; letter-spacing:.01em; color: var(--ink); font-weight: 800;
@@ -336,7 +355,6 @@ You can reach me at ${email}.`);
         }
         .lead{ font-size: var(--fs-lead); }
 
-        /* Cards */
         .glass-card, .hero-card{
           background: color-mix(in oklab, var(--bg-2) 55%, #222 45%);
           border:1px solid var(--border); border-radius: var(--radius-card);
@@ -346,7 +364,6 @@ You can reach me at ${email}.`);
         }
         .glass-card:hover, .hero-card:hover{ transform: translateY(-2px); box-shadow: 0 1px 0 rgba(255,255,255,.06) inset, 0 30px 80px rgba(0,0,0,.55); }
 
-        /* Buttons */
         .u-btn, .u-outline{ min-height:44px; }
         .u-btn{
           --b1: var(--brand); --b2: var(--brand-2);
@@ -354,17 +371,12 @@ You can reach me at ${email}.`);
           background: linear-gradient(135deg, var(--b1), var(--b2));
           border-radius: 9999px; padding:.65rem 1rem;
           box-shadow: 0 8px 22px rgba(0,0,0,.35);
-          transition: transform .12s ease, box-shadow .2s ease, filter .2s ease;
         }
-        .u-btn:hover{ transform: translateY(-2px); box-shadow: 0 12px 30px rgba(0,0,0,.45); }
         .u-outline{
           color: var(--brand)!important; background: transparent; border:2px solid currentColor;
           border-radius:9999px; padding:.6rem 1rem; font-weight:700;
-          transition: transform .12s ease, box-shadow .2s ease, background .2s ease, color .2s ease;
         }
-        .u-outline:hover{ color:#0b0b0b!important; background: var(--brand); box-shadow: 0 10px 26px rgba(0,0,0,.35); }
 
-        /* Links */
         a.ink-link{ color:var(--ink); text-decoration:none; position:relative; font-weight:600; }
         a.ink-link::after{ content:""; position:absolute; left:0; right:100%; bottom:-3px; height:2px; background: currentColor; transition:right .25s ease; opacity:.35; }
         a.ink-link:hover::after{ right:0; }
@@ -372,12 +384,10 @@ You can reach me at ${email}.`);
         .chip{ padding:.35rem .6rem; border-radius:9999px; border:1px solid var(--border); font-size:.8rem; color: var(--ink); background:#15151599; }
         .border-top{ border-color:var(--border)!important; }
 
-        /* Carousel touch zones */
         .carousel{ overflow:hidden; }
         .carousel-control-prev, .carousel-control-next { width: 12%; }
         .carousel-control-prev-icon, .carousel-control-next-icon { filter: invert(1) opacity(.85); }
 
-        /* ===== Skills Logo Carousel ===== */
         .tech-strip{
           background: color-mix(in oklab, var(--bg-2) 55%, #222 45%);
           border:1px solid var(--border);
@@ -402,27 +412,13 @@ You can reach me at ${email}.`);
           background:#ffffff10;
           box-shadow: 0 10px 26px rgba(0,0,0,.35);
         }
-        .tech-icon{
-          font-size: clamp(28px, 6.2vw, 42px);
-          filter: grayscale(.2) contrast(1.1) brightness(1.05);
-        }
-        .tech-label{
-          margin-top: .4rem;
-          font-size: .85rem;
-          color: var(--muted);
-          text-align:center;
-        }
+        .tech-icon{ font-size: clamp(28px, 6.2vw, 42px); filter: grayscale(.2) contrast(1.1) brightness(1.05); }
+        .tech-label{ margin-top: .4rem; font-size: .85rem; color: var(--muted); text-align:center; }
 
-        /* --- Tablet (<992px) --- */
         @media (max-width: 991.98px){
           :root{
-            --fs-title: 2.4rem;
-            --fs-h2: 1.6rem;
-            --fs-body: .975rem;
-            --fs-lead: 1.05rem;
-            --space-section: 3rem;
-            --hero-min: 560px;
-            --radius-card: 18px;
+            --fs-title: 2.4rem; --fs-h2: 1.6rem; --fs-body: .975rem; --fs-lead: 1.05rem;
+            --space-section: 3rem; --hero-min: 560px; --radius-card: 18px;
           }
           .center-nav{ --nav-h: 64px; }
           .container-narrow{ padding: 0 0.875rem; }
@@ -432,16 +428,10 @@ You can reach me at ${email}.`);
           .carousel-control-prev, .carousel-control-next { width: 14%; }
         }
 
-        /* --- Mobile (<=767.98px) --- */
         @media (max-width: 767.98px){
           :root{
-            --fs-title: 2rem;
-            --fs-h2: 1.35rem;
-            --fs-body: .95rem;
-            --fs-lead: 1rem;
-            --space-section: 2.5rem;
-            --hero-min: 520px;
-            --radius-card: 16px;
+            --fs-title: 2rem; --fs-h2: 1.35rem; --fs-body: .95rem; --fs-lead: 1rem;
+            --space-section: 2.5rem; --hero-min: 520px; --radius-card: 16px;
           }
           .center-nav{ --nav-h: 56px; }
           body{ line-height:1.5; }
@@ -450,19 +440,16 @@ You can reach me at ${email}.`);
           .hero-card{ margin-top:.25rem; }
           .chip{ font-size:.75rem; }
           .actions{ gap:.5rem !important; }
-          .actions > *{ flex:1 1 100%; width:100%; } /* stacked full width buttons */
+          .actions > *{ flex:1 1 100%; width:100%; }
           .carousel-control-prev, .carousel-control-next { width: 18%; }
         }
 
-        /* Back-to-top with iOS safe area */
         .back-to-top{
-          position:fixed;
-          right:16px;
+          position:fixed; right:16px;
           bottom: calc(16px + env(safe-area-inset-bottom));
           border-radius:9999px; z-index:40;
         }
 
-        /* Bootstrap gutter safety inside custom container (avoid horizontal overflow) */
         .container-narrow > .row{
           --bs-gutter-x: 1.5rem;
           margin-left: calc(var(--bs-gutter-x) * -0.5);
@@ -473,19 +460,15 @@ You can reach me at ${email}.`);
           padding-right: max(0.75rem, calc(var(--bs-gutter-x) * 0.5));
         }
 
-        /* Helper: button that looks like a text link for cert titles */
-        .as-link { 
-          color: inherit; 
-          text-decoration: none; 
-          cursor: pointer; 
-          background: transparent; 
-          border: 0;
-          padding: 0;
+        /* ✅ Avatar style */
+        .avatar{
+          width:64px; height:64px; border-radius:9999px; object-fit:cover; display:block;
+          border:1px solid var(--border);
+          background:#0b0b0b22;
         }
-        .as-link:hover { opacity: .9; }
       `}</style>
 
-      {/* ===================== NAVBAR (structure unchanged) ===================== */}
+      {/* ===================== NAVBAR ===================== */}
       <div className="center-nav">
         <div className={`nav-shell border rounded-pill shadow-sm ${showTop ? "scrolled" : ""}`}>
           <Navbar expand="md" className="rounded-pill px-2">
@@ -508,7 +491,6 @@ You can reach me at ${email}.`);
         </div>
       </div>
 
-      {/* spacer so content isn't hidden under fixed nav */}
       <div className="nav-spacer" aria-hidden />
 
       {/* ===================== HERO ===================== */}
@@ -555,7 +537,14 @@ You can reach me at ${email}.`);
                 <Col lg={5}>
                   <div className="hero-card p-3 p-md-4">
                     <div className="d-flex align-items-center gap-3">
-                      <div style={{width:64,height:64,borderRadius:"9999px", background:"linear-gradient(90deg, #7FB0C222, #F07B7122)", border:"1px solid var(--border)"}} />
+                      {/* ✅ Photo */}
+                      <img
+                        src={myPhoto}
+                        alt="Patrick Sigua"
+                        className="avatar"
+                        width={64}
+                        height={64}
+                      />
                       <div>
                         <div className="fw-semibold">Patrick Gabriel T. Sigua</div>
                         <div className="small muted">Computer Science</div>
@@ -565,7 +554,6 @@ You can reach me at ${email}.`);
                     <div className="small d-grid gap-2">
                       <span className="d-flex align-items-center gap-2"><FiMapPin /> Based in: <strong>Angeles City, Pampanga</strong></span>
                       <span className="d-flex align-items-center gap-2"><FiMail /> <a className="ink-link break" href="mailto:patricksigua007@gmail.com">patricksigua007@gmail.com</a></span>
-                      <span className="d-flex align-items-center gap-2"><FiLinkedin /> <a className="ink-link break" href="https://www.linkedin.com/in/patrick-sigua-8a4b15349/">https://www.linkedin.com/in/patrick-sigua-8a4b15349/</a></span>
                     </div>
                   </div>
                 </Col>
@@ -582,13 +570,13 @@ You can reach me at ${email}.`);
         <div className="container-narrow">
           <div className="tech-strip">
             <Carousel
-              controls={false}     /* hide arrows */
-              indicators={false}   /* no dots */
-              interval={2200}      /* auto-advance */
-              pause={false}        /* never pause on hover */
-              wrap                 /* infinite loop */
-              touch                /* swipe on touch devices */
-              keyboard={false}     /* ignore keyboard arrows */
+              controls={false}
+              indicators={false}
+              interval={2200}
+              pause={false}
+              wrap
+              touch
+              keyboard={false}
               fade={false}
             >
               {slides.map((group, idx) => (
@@ -681,7 +669,7 @@ You can reach me at ${email}.`);
                 <Card.Body className="p-4 p-md-5">
                   <div className="d-flex align-items-center justify-content-between mb-3">
                     <h2 className="unreal-title" style={{ fontSize: "var(--fs-h2)" }}>Resume</h2>
-                    <a className="u-outline" href= {resumepdf} download><FiDownload className="me-2" />Download PDF</a>
+                    <a className="u-outline" href={resumepdf} download><FiDownload className="me-2" />Download PDF</a>
                   </div>
 
                   {/* Certificates list (click to open) */}
@@ -760,16 +748,18 @@ You can reach me at ${email}.`);
                 <Card.Body className="p-4 p-md-5">
                   <h2 className="unreal-title" style={{ fontSize: "var(--fs-h2)" }}>Contact</h2>
                   <p className="muted">Looking for OJT / internship opportunities. Send me a message — I’ll reply as soon as I can.</p>
-                  <Form onSubmit={handleContactSubmit} className="mt-3">
+
+                  {/* UPDATED: AJAX Formspree submit + status messages */}
+                  <Form onSubmit={handleContactSubmit} className="mt-3" noValidate>
                     <Row className="g-3">
                       <Col md={6}>
                         <FloatingLabel controlId="name" label="Your name">
-                          <Form.Control type="text" name="name" placeholder="Juan Dela Cruz" required />
+                          <Form.Control type="text" name="name" placeholder="Lance Cabe" required />
                         </FloatingLabel>
                       </Col>
                       <Col md={6}>
                         <FloatingLabel controlId="email" label="Email address">
-                          <Form.Control type="email" name="email" placeholder="name@email.com" required />
+                          <Form.Control type="email" name="email" placeholder="cabelance@email.com" required />
                         </FloatingLabel>
                       </Col>
                       <Col xs={12}>
@@ -777,8 +767,29 @@ You can reach me at ${email}.`);
                           <Form.Control as="textarea" name="message" placeholder="Hi! I'm interested in..." style={{ height: 140 }} required />
                         </FloatingLabel>
                       </Col>
+
+                      {/* Status message */}
                       <Col xs={12}>
-                        <button type="submit" className="u-btn w-100">Send Message</button>
+                        {submitStatus === "success" && (
+                          <div className="alert alert-success mb-0" role="alert">
+                            {submitMsg || "Thanks! Your message has been sent."}
+                          </div>
+                        )}
+                        {submitStatus === "error" && (
+                          <div className="alert alert-danger mb-0" role="alert">
+                            {submitMsg || "Something went wrong. Please try again."}
+                          </div>
+                        )}
+                      </Col>
+
+                      <Col xs={12}>
+                        <button
+                          type="submit"
+                          className="u-btn w-100"
+                          disabled={submitStatus === "loading"}
+                        >
+                          {submitStatus === "loading" ? "Sending..." : "Send Message"}
+                        </button>
                       </Col>
                     </Row>
                   </Form>
@@ -807,7 +818,7 @@ You can reach me at ${email}.`);
           <div className="small muted">© {year} Patrick Sigua — All rights reserved.</div>
           <div className="d-flex align-items-center gap-3">
             <a className="ink-link small d-flex align-items-center gap-1" href="mailto:patricksigua007@gmail.com"><FiMail /> Email</a>
-            <a className="ink-link small d-flex align-items-center gap-1" href="#"><FiGithub /> GitHub</a>
+            <a className="ink-link small d-flex align-items-center gap-1" href="https://github.com/cspatrick-hau"><FiGithub /> GitHub</a>
             <a className="ink-link small d-flex align-items-center gap-1" href="https://www.linkedin.com/in/patrick-sigua-8a4b15349/"><FiLinkedin /> LinkedIn</a>
           </div>
         </div>
