@@ -64,7 +64,7 @@ import myPhoto from "./assets/1X1.jpg";
 const TESTIMONIALS = [
   { quote: "A fast learner with strong ownership.", name: "Lance Pogi", role: "Team Lead" },
   { quote: "Clean code and great communication.", name: "Lance mas pogi", role: "Advisor" },
-  { quote: "Turns user needs into polished UI.", name: "Lance pinaka pogi", role: "Designer" },
+  { quote: "Turns user needs into polished UI.", name: "Lance pinaka pogi", role: "UI Designer" },
 ];
 
 const SKILLS = [
