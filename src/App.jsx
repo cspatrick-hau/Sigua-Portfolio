@@ -475,7 +475,7 @@ export default function Portfolio() {
             <Container fluid className="px-2">
               <Navbar.Brand href="#top" className="fw-semibold d-flex align-items-center gap-2">
                 <img src={myLogo} alt="Logo" className="brand-logo" />
-                <span>CS Portfolio</span>
+                <span>Portfolio</span>
               </Navbar.Brand>
               <Navbar.Toggle className="ms-auto" />
               <Navbar.Collapse>
