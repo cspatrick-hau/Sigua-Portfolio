@@ -40,14 +40,12 @@ import {
 } from "react-icons/fi";
 import {
   SiJavascript,
-  SiTypescript,
   SiReact,
   SiBootstrap,
   SiNodedotjs,
   SiExpress,
   SiPython,
   SiMysql,
-  SiMongodb,
   SiGit,
   SiGithub as SiGithubLogo,
 } from "react-icons/si";
@@ -61,12 +59,6 @@ import cert5 from "./assets/Dataanalytics.jpg";
 import resumepdf from "./assets/Sigua_Resume.pdf";
 import myPhoto from "./assets/1X1.jpg";
 
-const TESTIMONIALS = [
-  { quote: "A fast learner with strong ownership.", name: "Lance Pogi", role: "Team Lead" },
-  { quote: "Clean code and great communication.", name: "Lance mas pogi", role: "Advisor" },
-  { quote: "Turns user needs into polished UI.", name: "Lance pinaka pogi", role: "UI Designer" },
-];
-
 const SKILLS = [
   { name: "JavaScript / TypeScript", level: 80 },
   { name: "React & React-Bootstrap", level: 85 },
@@ -78,14 +70,12 @@ const SKILLS = [
 
 const SKILL_ICONS = [
   { label: "JavaScript", Icon: SiJavascript },
-  { label: "TypeScript", Icon: SiTypescript },
   { label: "React", Icon: SiReact },
   { label: "Bootstrap", Icon: SiBootstrap },
   { label: "Node.js", Icon: SiNodedotjs },
   { label: "Express", Icon: SiExpress },
   { label: "Python", Icon: SiPython },
   { label: "MySQL", Icon: SiMysql },
-  { label: "MongoDB", Icon: SiMongodb },
   { label: "Git", Icon: SiGit },
   { label: "GitHub", Icon: SiGithubLogo },
 ];
@@ -484,7 +474,6 @@ export default function Portfolio() {
               <Navbar.Collapse>
                 <Nav className="ms-auto align-items-center gap-2">
                   <Nav.Link href="#about">About</Nav.Link>
-                  <Nav.Link href="#testimonial">Testimonial</Nav.Link>
                   <Nav.Link href="#resume">Resume</Nav.Link>
                   <Nav.Link href="#contact">Contact</Nav.Link>
                 </Nav>
@@ -672,29 +661,6 @@ export default function Portfolio() {
         </div>
       </section>
 
-      {/* TESTIMONIALS */}
-      <section id="testimonial" className="section layer-1">
-        <div className="container-narrow">
-          <Card className="glass-card">
-            <Card.Body className="p-4 p-md-5">
-              <h2 className="unreal-title" style={{ fontSize: "var(--fs-h2)" }}>Testimonials</h2>
-              <Carousel interval={6000} indicators controls touch>
-                {TESTIMONIALS.map((t, i) => (
-                  <Carousel.Item key={i}>
-                    <figure className="text-center p-3 p-md-4">
-                      <blockquote className="blockquote fs-5">“{t.quote}”</blockquote>
-                      <figcaption className="blockquote-footer mt-3" style={{ color: "var(--muted)" }}>
-                        {t.name} <cite className="text-secondary">— {t.role}</cite>
-                      </figcaption>
-                    </figure>
-                  </Carousel.Item>
-                ))}
-              </Carousel>
-            </Card.Body>
-          </Card>
-        </div>
-      </section>
-
       {/* RESUME */}
       <section id="resume" className="section layer-1">
         <div className="container-narrow">
@@ -760,7 +726,7 @@ export default function Portfolio() {
 
                     <span className="d-flex align-items-center gap-2">
                       <FiGlobe /> Website:{" "}
-                      <a className="ink-link break" href="#top">panayan taya pa deploy</a>
+                      <a className="ink-link break" href="#top">https://sigua-portfolio.vercel.app/</a>
                     </span>
                     <span className="d-flex align-items-center gap-2">
                       <FiGithub /> GitHub:{" "}
