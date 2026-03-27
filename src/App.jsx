@@ -114,6 +114,30 @@ const CERTIFICATES = [
   },
 ];
 
+const PROJECTS = [
+  {
+    title: "FreedFromWalls",
+    description:
+      "A personal journal app where you can freely log your goals, track what you want to do, and express how you feel — all in one place. Built to give you a space to reflect, plan, and stay in tune with yourself.",
+    tags: ["React", "JavaScript", "CSS"],
+    repo: "https://github.com/ptrcksg/freedfromwalls.git",
+  },
+  {
+    title: "ArniScore",
+    description:
+      "Detects valid strikes for Arnis using a Hybrid CNN-LSTM and YOLO model — a computer vision system for sports officiating.",
+    tags: ["Python", "YOLO", "CNN", "LSTM", "Computer Vision"],
+    repo: "https://github.com/ptrcksg/ArniScore.git",
+  },
+  {
+    title: "BenIbeFlowers System",
+    description:
+      "A flower shop management system for BenIbe Flowers handling inventory and orders.",
+    tags: ["JavaScript", "MySQL", "Node.js"],
+    repo: "https://github.com/ptrcksg/BenIbeFlowers.git",
+  },
+];
+
 const chunk = (arr, size) =>
   Array.from({ length: Math.ceil(arr.length / size) }, (_, i) =>
     arr.slice(i * size, i * size + size)
@@ -474,6 +498,7 @@ export default function Portfolio() {
               <Navbar.Collapse>
                 <Nav className="ms-auto align-items-center gap-2">
                   <Nav.Link href="#about">About</Nav.Link>
+                  <Nav.Link href="#projects">Projects</Nav.Link>
                   <Nav.Link href="#resume">Resume</Nav.Link>
                   <Nav.Link href="#contact">Contact</Nav.Link>
                 </Nav>
@@ -585,6 +610,45 @@ export default function Portfolio() {
               ))}
             </Carousel>
           </div>
+        </div>
+      </section>
+
+      {/* PROJECTS */}
+      <section id="projects" className="section layer-1">
+        <div className="container-narrow">
+          <h2 className="unreal-title mb-4" style={{ fontSize: "var(--fs-h2)" }}>
+            Projects
+          </h2>
+          <Row className="g-4">
+            {PROJECTS.map((p) => (
+              <Col md={4} key={p.title}>
+                <Card className="glass-card h-100">
+                  <Card.Body className="p-4 d-flex flex-column gap-3">
+                    <div>
+                      <h5 className="fw-semibold mb-1">{p.title}</h5>
+                      <p className="muted small mb-0">{p.description}</p>
+                    </div>
+                    <div className="d-flex flex-wrap gap-2">
+                      {p.tags.map((t) => (
+                        <span key={t} className="chip">{t}</span>
+                      ))}
+                    </div>
+                    <div className="mt-auto">
+                      
+                      <a  href={p.repo}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="u-outline d-inline-flex align-items-center gap-2"
+                        style={{ fontSize: ".875rem" }}
+                      >
+                        <FiGithub /> View Repo
+                      </a>
+                    </div>
+                  </Card.Body>
+                </Card>
+              </Col>
+            ))}
+          </Row>
         </div>
       </section>
 
